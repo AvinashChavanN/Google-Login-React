@@ -42,6 +42,25 @@ export default class Authen extends Component {
       var lin = document.getElementById('login');
       lin.classList.remove('hide');
   }
+  google(){
+    var provider = new firebase.auth.GoogleAuthProvider();
+    var promise = firebase.auth().signInWithPopup(provider);
+
+    promise
+    .then(result=>{
+      var user = result.user;
+      console.log(result);
+      firebase.database().ref('user'+user.uid).set({
+        email:user.email,
+        name:user.displayName
+      });
+    });
+
+    promise.catch(e=>{
+      var err = e.message;
+      console.log(err);
+    });
+  }
   login(event){
     const email = this.refs.email.value;
     const password = this.refs.pass.value;
@@ -73,6 +92,7 @@ export default class Authen extends Component {
     this.login=this.login.bind(this);
     this.signup=this.signup.bind(this);
     this.logout=this.logout.bind(this);
+    this.google=this.google.bind(this);
   }
   render(){
     return(
@@ -82,7 +102,8 @@ export default class Authen extends Component {
         <p>{this.state.err}</p>
         <button id ="login" onClick={this.login}>Log In</button>
         <button onClick={this.signup}>Sign Up</button>
-        <button id ="logout" className ="hide" onClick={this.logout}>Log Out</button>
+        <button id ="logout" className ="hide" onClick={this.logout}>Log Out</button><br/>
+        <button id ="google"  onClick={this.google}>Sign in with Google</button>
       </div>
     );
   }
